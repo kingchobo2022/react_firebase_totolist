@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { addToto } from "./services/todoService";
 
 function App() {
 
@@ -6,12 +7,22 @@ function App() {
   const [adding, setAdding] = useState(false);
 
   // Todo 추가
-  const handleAddTodo = (e: React.FormEvent) => {
+  const handleAddTodo = async(e: React.FormEvent) => {
     e.preventDefault();
     //console.log(newTitle);
     const title = newTitle.trim();
     if (!title) return;
     setAdding(true);
+    try {
+      addToto(title);
+      setNewTitle("");
+    } catch (e) {
+      console.error(e);
+      alert("추가 중 오류가 발생했습니다.");
+    } finally{
+      setAdding(false);
+    }
+
   }
 
   return (
