@@ -1,4 +1,4 @@
-import { addDoc, collection, getDocs, orderBy, query } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDocs, orderBy, query, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import type { Todo } from "../types/todo";
 
@@ -25,4 +25,16 @@ export async function addToto(title: string): Promise<void> {
         completed: false,
         createdAt: Date.now()
     });
+}
+
+// 완료 상태 코드
+export async function toggleTodo(id: string, completed: boolean) {
+    const ref = doc(db, "todos", id);
+    await updateDoc(ref, {completed}); 
+}
+
+// 삭제
+export async function deleteTodo(id: string): Promise<void> {
+    const ref = doc(db, "todos", id);
+    await deleteDoc(ref);
 }

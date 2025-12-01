@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { addToto, fetchTodos } from "./services/todoService";
+import { addToto, deleteTodo, fetchTodos, toggleTodo } from "./services/todoService";
 import type { Todo } from "./types/todo";
 
 function App() {
@@ -27,6 +27,20 @@ function App() {
     )(); // 즉시 실행 함수 IIFE (Immediately Invoked Function Expression)
   }, []);
 
+  // 완료 체크 토글
+  const handleToggle = async (id: string, completed: boolean) => {
+    try {
+      await toggleTodo(id, completed);
+      setTodos((prev) => prev.map(
+        (todo) => todo.id === id ? { ...todo, completed} : todo
+      ));
+
+    } catch (e) {
+      console.error(e);
+      alert("업데이트 중 오류가 발생했습니다.");
+    }
+  }
+
   // Todo 추가
   const handleAddTodo = async(e: React.FormEvent) => {
     e.preventDefault();
@@ -47,8 +61,19 @@ function App() {
     } finally{
       setAdding(false);
     }
-
   }
+
+  // 삭제
+  const handleDelete = async (id: string) => {
+    if(!confirm("정말 삭제하시겠습니까?")) return;
+    try {
+      await deleteTodo(id);
+      setTodos((prev) => prev.filter((todo) => todo.id !== id));
+    } catch (e) {
+      console.error(e);
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+   }
 
   return (
     <main className="min-h-screen flex bg-slate-100 flex items-center justify-center p-4">
@@ -85,14 +110,17 @@ function App() {
             <label className="flex items-center gap-2 flex-1">
               <input type="checkbox" 
                 checked={todo.completed}
+                onChange={(e) => handleToggle(todo.id, e.target.checked)}
               className="w-4 h-4" />
               <span 
               
-              className="text-sm ${
+              className={`text-sm ${
                 todo.completed ? 'line-through text-slate-400' : 'text-slate-700'
-              }">{todo.title}</span>
+              }`}>{todo.title}</span>
             </label>
-            <button className="text-xs text-red-500 hover:text-red-600 px-2 py-1 transition">삭제</button>
+            <button 
+            onClick={() => { handleDelete(todo.id) }} 
+            className="text-xs text-red-500 hover:text-red-600 px-2 py-1 transition">삭제</button>
           </li>
           ))}
 
